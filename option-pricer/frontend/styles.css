@@ -1,0 +1,393 @@
+:root {
+  color-scheme: light;
+  --bg: #faf3e8;
+  --fg: #1b1f27;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --border: #e4ddcd;
+  --input-bg: #f7f3ea;
+  --accent: #1b1f27;
+  --track-bg: #e4ddcd;
+  --error-bg: #fdecea;
+  --error-text: #8a2a1f;
+  --chart-price: #2f6fed;
+  --chart-greek: #e0527a;
+  --chart-grid: #e9e4d8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding: 32px 16px 64px;
+}
+
+main {
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 26px;
+  margin: 0 0 24px;
+  letter-spacing: -0.01em;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+  gap: 28px;
+}
+
+.layout-right {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .layout-right {
+    display: block;
+  }
+}
+
+.field-row {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.field-row.three-col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.field-row.two-col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 640px) {
+  .field-row.three-col,
+  .field-row.two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+fieldset.field {
+  border: none;
+  padding: 0;
+  margin: 0 0 20px;
+}
+
+label,
+legend {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  padding: 0;
+}
+
+.required {
+  color: var(--chart-greek);
+}
+
+.hint {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  min-height: 2.8em;
+  color: var(--muted);
+}
+
+input[type="number"] {
+  width: 100%;
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--fg);
+}
+
+input[type="number"]:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.slider-wrap {
+  position: relative;
+  padding-top: 26px;
+}
+
+.slider-bubble {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--track-bg);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--accent);
+  cursor: pointer;
+  margin-top: 0;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--accent);
+  cursor: pointer;
+}
+
+.slider-range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.card-group {
+  display: grid;
+  gap: 10px;
+}
+
+.card-group.two-col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.card-group.greek-grid {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+@media (max-width: 640px) {
+  .card-group.greek-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.option-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.option-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.option-card .radio-dot {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--muted);
+  background: #fff;
+}
+
+.option-card:has(input:checked) {
+  background: var(--card);
+  border-color: var(--accent);
+  border-width: 2px;
+  padding: 9px 13px;
+}
+
+.option-card:has(input:checked) .radio-dot {
+  border-color: var(--accent);
+  background: radial-gradient(circle, var(--accent) 0 40%, transparent 44%);
+}
+
+.error {
+  margin: 0 0 20px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--error-bg);
+  color: var(--error-text);
+  font-size: 14px;
+}
+
+.results-card,
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.chart-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card[hidden] {
+  display: none;
+}
+
+.results-card h2 {
+  margin: 0 0 14px;
+  font-size: 19px;
+}
+
+.greek-list {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.greek-list > div {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+.greek-list dt {
+  color: var(--muted);
+}
+
+.greek-list dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.chart-header h2 {
+  margin: 0;
+  font-size: 18px;
+  text-align: center;
+  flex: 1 1 auto;
+}
+
+.chart-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.chart-actions button {
+  font: inherit;
+  font-size: 13px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.chart-actions button:hover {
+  background: var(--card);
+  border-color: var(--accent);
+}
+
+.chart-svg-wrap {
+  flex: 1;
+  min-height: 240px;
+}
+
+#chart-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  font-family: inherit;
+}
+
+@media (max-width: 900px) {
+  .chart-svg-wrap {
+    flex: none;
+    min-height: 0;
+  }
+
+  #chart-svg {
+    height: auto;
+  }
+}
+
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--fg);
+}
+
+.chart-legend .legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-legend .legend-swatch {
+  display: inline-block;
+  width: 20px;
+  height: 0;
+  border-top-width: 2px;
+  border-top-style: solid;
+}
+
+fieldset.greek-type-field {
+  margin: 20px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.greek-type-field legend {
+  margin-bottom: 10px;
+}
