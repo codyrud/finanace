@@ -36,6 +36,8 @@ CSS = """
         border-radius: 12px;
         background: rgba(15, 23, 42, 0.62);
         padding: 1rem 1.2rem;
+        max-width: 420px;
+        width: 100%;
     }
     .metric-row {
         display: flex;
@@ -65,22 +67,14 @@ CSS = """
     .stNumberInput label, .stSlider label, .stRadio label, .stFormSubmitButton label {
         color: #edf4fb !important;
     }
-    .stTextInput > div > div > input,
-    .stNumberInput > div > div > input,
-    .stSlider > div > div > div {
+    .stNumberInput input, .stSlider > div > div > div {
         background: rgba(15, 23, 42, 0.7);
         color: #edf4fb;
         border: 1px solid rgba(148,163,184,0.35);
     }
-    .stSlider [data-testid="stBaseWidgetLabel"] {
-        color: #edf4fb !important;
-    }
     .stRadio [role="radiogroup"] {
         display: flex;
         gap: 0.75rem;
-    }
-    .stRadio label {
-        color: #edf4fb !important;
     }
     .stFormSubmitButton button {
         background: rgba(15, 23, 42, 0.72);
@@ -91,9 +85,6 @@ CSS = """
     }
     .stRadio input {
         accent-color: #ff5a5f;
-    }
-    .stDataFrame, .stAltairChart {
-        background: transparent;
     }
 </style>
 """
@@ -147,7 +138,7 @@ def render_chart(df: pd.DataFrame, greek_name: str) -> None:
         .mark_line(color="#ff5a5f", strokeDash=[6, 4], strokeWidth=2.2)
         .encode(
             x=alt.X("Spot:Q", title="Spot Price"),
-            y=alt.Y(f"{greek_key.title()}:Q", title=f"{greek_name} (Δ)"),
+            y=alt.Y(f"{greek_key.title()}:Q", title=f"{greek_name}"),
         )
     )
 
@@ -181,7 +172,7 @@ def app() -> None:
 
         with right:
             st.markdown('<div class="section-title">Black-Scholes Model</div>', unsafe_allow_html=True)
-            st.markdown('<div style="height: 0.5rem"></div>', unsafe_allow_html=True)
+            greek_choice = st.radio("Greek Type", ["Delta", "Gamma", "Vega", "Theta", "Rho"], index=0, horizontal=True)
 
             payload = {
                 "option_type": option_type,
@@ -198,15 +189,11 @@ def app() -> None:
                 return
 
             curve_df = pd.DataFrame(build_curve_payloads(payload))
-
-            greek_choice = st.radio("Greek Type", ["Delta", "Gamma", "Vega", "Theta", "Rho"], index=0, horizontal=True)
             render_chart(curve_df, greek_choice)
 
-    st.markdown('<div style="height: 1rem"></div>', unsafe_allow_html=True)
+    lower_left, lower_right = st.columns([0.9, 1.9], gap="large")
 
-    left_result, right_result = st.columns([0.92, 1.55], gap="large")
-
-    with left_result:
+    with lower_left:
         st.markdown(
             f"""
             <div class='metric-box'>
@@ -221,8 +208,7 @@ def app() -> None:
             unsafe_allow_html=True,
         )
 
-    with right_result:
-        # kept for visual parity with the mockup but the chart is rendered in the right panel above
+    with lower_right:
         st.empty()
 
 
