@@ -166,6 +166,7 @@ def app() -> None:
     curve_df = pd.DataFrame(build_curve_payloads(payload))
 
     st.markdown('<div style="height: 0.5rem"></div>', unsafe_allow_html=True)
+
     left_result, right_result = st.columns([0.9, 1.6], gap="large")
 
     with left_result:
@@ -184,11 +185,13 @@ def app() -> None:
         )
 
     with right_result:
+        st.markdown('<div class="small-label" style="margin-top: 0.25rem;">Greek Type</div>', unsafe_allow_html=True)
         greek_choice = st.radio(
-            "Greek Type",
+            "",
             ["Delta", "Gamma", "Vega", "Theta", "Rho"],
             index=0,
             horizontal=True,
+            label_visibility="collapsed",
         )
         render_chart(curve_df, greek_choice)
 
