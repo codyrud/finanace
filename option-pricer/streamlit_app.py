@@ -110,7 +110,7 @@ def render_chart(df: pd.DataFrame, greek_name: str) -> None:
     )
 
     chart = alt.layer(price_chart, greek_chart).resolve_scale(y="independent")
-    st.altair_chart(chart, use_container_width=True)
+    st.altair_chart(chart, width="stretch")
 
 
 def app() -> None:
@@ -137,7 +137,7 @@ def app() -> None:
                 vol_pct = st.slider("Volatility (%) *", min_value=0.5, max_value=100.0, value=20.0, step=0.5)
 
             st.markdown('<div class="small-label">Option Type *</div>', unsafe_allow_html=True)
-            option_type = st.radio("", ["call", "put"], horizontal=True, label_visibility="collapsed")
+            option_type = st.radio("Option Type", ["call", "put"], horizontal=True)
 
             submitted = st.form_submit_button("Price option")
 
@@ -187,11 +187,10 @@ def app() -> None:
     with right_result:
         st.markdown('<div class="small-label" style="margin-top: 0.25rem;">Greek Type</div>', unsafe_allow_html=True)
         greek_choice = st.radio(
-            "",
+            "Greek Type",
             ["Delta", "Gamma", "Vega", "Theta", "Rho"],
             index=0,
             horizontal=True,
-            label_visibility="collapsed",
         )
         render_chart(curve_df, greek_choice)
 
