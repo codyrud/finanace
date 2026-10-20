@@ -5,58 +5,100 @@ import streamlit as st
 from backend.api import handle_price_request
 
 
+st.set_page_config(page_title="Option Pricer", layout="wide")
+
 CSS = """
 <style>
+    .stApp {
+        background: #071722;
+        color: #edf4fb;
+    }
     .main .block-container {
         max-width: 1400px;
         padding-top: 1rem;
         padding-bottom: 2rem;
     }
-    .app-shell {
-        background: #f3efe9;
+    .title {
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: #edf4fb;
+        margin-bottom: 1rem;
     }
-    .uibox {
-        background: #f7f5f1;
-        border: 1px solid rgba(40,45,52,0.28);
+    .panel {
+        border: 1px solid rgba(148,163,184,0.35);
         border-radius: 12px;
+        background: rgba(15, 23, 42, 0.7);
         padding: 1rem 1.1rem 0.8rem 1.1rem;
         margin-bottom: 1rem;
     }
     .metric-box {
-        background: #f5f4f1;
-        border: 1px solid rgba(40,45,52,0.28);
+        border: 1px solid rgba(148,163,184,0.35);
         border-radius: 12px;
+        background: rgba(15, 23, 42, 0.62);
         padding: 1rem 1.2rem;
-        margin-top: 0.5rem;
     }
-    .big-title {
-        font-size: 2.2rem;
-        font-weight: 800;
-        margin-bottom: 1rem;
-        color: #1d2431;
-    }
-    .small-label {
-        font-size: 0.9rem;
-        color: #2b2d35;
-        font-weight: 600;
-        display: block;
-        margin-bottom: 0.25rem;
-    }
-    .result-row {
+    .metric-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.5rem 0;
-        border-top: 1px solid rgba(40,45,52,0.18);
+        padding: 0.6rem 0;
+        border-top: 1px solid rgba(148,163,184,0.25);
+        color: #edf4fb;
     }
-    .chart-title {
-        font-size: 1.15rem;
+    .metric-row:first-child {
+        border-top: 0;
+    }
+    .metric-row .label {
+        color: #d9e4f2;
+        font-weight: 500;
+    }
+    .metric-row .value {
         font-weight: 700;
-        color: #1d2431;
-        margin: 0 0 0.25rem 0;
+        color: #ffffff;
+    }
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #edf4fb;
+        margin: 0 0 0.5rem 0;
+    }
+    .stNumberInput label, .stSlider label, .stRadio label, .stFormSubmitButton label {
+        color: #edf4fb !important;
+    }
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input,
+    .stSlider > div > div > div {
+        background: rgba(15, 23, 42, 0.7);
+        color: #edf4fb;
+        border: 1px solid rgba(148,163,184,0.35);
+    }
+    .stSlider [data-testid="stBaseWidgetLabel"] {
+        color: #edf4fb !important;
+    }
+    .stRadio [role="radiogroup"] {
+        display: flex;
+        gap: 0.75rem;
+    }
+    .stRadio label {
+        color: #edf4fb !important;
+    }
+    .stFormSubmitButton button {
+        background: rgba(15, 23, 42, 0.72);
+        color: #edf4fb;
+        border: 1px solid rgba(148,163,184,0.4);
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    .stRadio input {
+        accent-color: #ff5a5f;
+    }
+    .stDataFrame, .stAltairChart {
+        background: transparent;
     }
 </style>
 """
+
+st.markdown(CSS, unsafe_allow_html=True)
 
 
 def build_curve_payloads(payload: dict) -> list[dict]:
@@ -65,7 +107,7 @@ def build_curve_payloads(payload: dict) -> list[dict]:
     max_spot = center_spot * 1.3
     spots = [min_spot + (max_spot - min_spot) * i / 24 for i in range(25)]
 
-    rows = []
+    rows: list[dict] = []
     for spot in spots:
         resp, status = handle_price_request({**payload, "spot": spot})
         if status != 200:
@@ -93,7 +135,7 @@ def render_chart(df: pd.DataFrame, greek_name: str) -> None:
     greek_key = greek_name.lower()
     price_chart = (
         alt.Chart(df)
-        .mark_line(color="#1f5fbf", strokeWidth=2.5)
+        .mark_line(color="#3b82f6", strokeWidth=2.5)
         .encode(
             x=alt.X("Spot:Q", title="Spot Price"),
             y=alt.Y("Price:Q", title="Theoretical Price"),
@@ -102,7 +144,7 @@ def render_chart(df: pd.DataFrame, greek_name: str) -> None:
 
     greek_chart = (
         alt.Chart(df)
-        .mark_line(color="#d95473", strokeDash=[6, 4], strokeWidth=2.2)
+        .mark_line(color="#ff5a5f", strokeDash=[6, 4], strokeWidth=2.2)
         .encode(
             x=alt.X("Spot:Q", title="Spot Price"),
             y=alt.Y(f"{greek_key.title()}:Q", title=f"{greek_name} (Δ)"),
@@ -114,12 +156,10 @@ def render_chart(df: pd.DataFrame, greek_name: str) -> None:
 
 
 def app() -> None:
-    st.set_page_config(page_title="Option Pricer", layout="wide")
-    st.markdown(CSS, unsafe_allow_html=True)
-    st.markdown('<div class="big-title">Vanilla Option Calculator</div>', unsafe_allow_html=True)
+    st.markdown('<div class="title">Vanilla Option Calculator</div>', unsafe_allow_html=True)
 
     with st.form("pricing_form"):
-        left, right = st.columns([1.05, 1.35], gap="large")
+        left, right = st.columns([1.1, 1.3], gap="large")
 
         with left:
             c1, c2, c3 = st.columns(3)
@@ -136,63 +176,54 @@ def app() -> None:
             with r2:
                 vol_pct = st.slider("Volatility (%) *", min_value=0.5, max_value=100.0, value=20.0, step=0.5)
 
-            st.markdown('<div class="small-label">Option Type *</div>', unsafe_allow_html=True)
-            option_type = st.radio("Option Type", ["call", "put"], horizontal=True)
-
+            option_type = st.radio("Option Type *", ["call", "put"], horizontal=True)
             submitted = st.form_submit_button("Price option")
 
         with right:
-            st.markdown('<p class="chart-title">Black-Scholes Model</p>', unsafe_allow_html=True)
-            if not submitted:
-                st.caption("Enter your inputs and click Price option to generate the curve.")
+            st.markdown('<div class="section-title">Black-Scholes Model</div>', unsafe_allow_html=True)
+            st.markdown('<div style="height: 0.5rem"></div>', unsafe_allow_html=True)
 
-    if not submitted:
-        return
+            payload = {
+                "option_type": option_type,
+                "spot": float(spot),
+                "strike": float(strike),
+                "time_to_expiry": float(days_to_maturity) / 365.0,
+                "rate": float(rate_pct) / 100.0,
+                "volatility": float(vol_pct) / 100.0,
+            }
+            body, status = handle_price_request(payload)
 
-    payload = {
-        "option_type": option_type,
-        "spot": float(spot),
-        "strike": float(strike),
-        "time_to_expiry": float(days_to_maturity) / 365.0,
-        "rate": float(rate_pct) / 100.0,
-        "volatility": float(vol_pct) / 100.0,
-    }
+            if status != 200:
+                st.error(body.get("error", "Unable to price this option."))
+                return
 
-    body, status = handle_price_request(payload)
-    if status != 200:
-        st.error(body.get("error", "Unable to price this option."))
-        return
+            curve_df = pd.DataFrame(build_curve_payloads(payload))
 
-    curve_df = pd.DataFrame(build_curve_payloads(payload))
+            greek_choice = st.radio("Greek Type", ["Delta", "Gamma", "Vega", "Theta", "Rho"], index=0, horizontal=True)
+            render_chart(curve_df, greek_choice)
 
-    st.markdown('<div style="height: 0.5rem"></div>', unsafe_allow_html=True)
+    st.markdown('<div style="height: 1rem"></div>', unsafe_allow_html=True)
 
-    left_result, right_result = st.columns([0.9, 1.6], gap="large")
+    left_result, right_result = st.columns([0.92, 1.55], gap="large")
 
     with left_result:
         st.markdown(
             f"""
             <div class='metric-box'>
-                <div class='result-row'><span>Price:</span><strong>{body['price']:.4f}</strong></div>
-                <div class='result-row'><span>Delta</span><span>{body['greeks']['delta']:.4f}</span></div>
-                <div class='result-row'><span>Gamma</span><span>{body['greeks']['gamma']:.4f}</span></div>
-                <div class='result-row'><span>Theta</span><span>{body['greeks']['theta']:.4f}</span></div>
-                <div class='result-row'><span>Vega</span><span>{body['greeks']['vega']:.4f}</span></div>
-                <div class='result-row'><span>Rho</span><span>{body['greeks']['rho']:.4f}</span></div>
+                <div class='metric-row'><div class='label'>Price:</div><div class='value'>{body['price']:.4f}</div></div>
+                <div class='metric-row'><div class='label'>Delta</div><div class='value'>{body['greeks']['delta']:.4f}</div></div>
+                <div class='metric-row'><div class='label'>Gamma</div><div class='value'>{body['greeks']['gamma']:.4f}</div></div>
+                <div class='metric-row'><div class='label'>Theta</div><div class='value'>{body['greeks']['theta']:.4f}</div></div>
+                <div class='metric-row'><div class='label'>Vega</div><div class='value'>{body['greeks']['vega']:.4f}</div></div>
+                <div class='metric-row'><div class='label'>Rho</div><div class='value'>{body['greeks']['rho']:.4f}</div></div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
     with right_result:
-        st.markdown('<div class="small-label" style="margin-top: 0.25rem;">Greek Type</div>', unsafe_allow_html=True)
-        greek_choice = st.radio(
-            "Greek Type",
-            ["Delta", "Gamma", "Vega", "Theta", "Rho"],
-            index=0,
-            horizontal=True,
-        )
-        render_chart(curve_df, greek_choice)
+        # kept for visual parity with the mockup but the chart is rendered in the right panel above
+        st.empty()
 
 
 if __name__ == "__main__":
