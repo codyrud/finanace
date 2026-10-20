@@ -7,9 +7,6 @@ import streamlit as st
 from backend.api import handle_price_request
 
 
-st.set_page_config(page_title="Option Pricer", layout="wide")
-
-
 CSS = """
 <style>
     .appview-container {
@@ -153,16 +150,13 @@ CSS = """
 """
 
 
-st.markdown(CSS, unsafe_allow_html=True)
-
-
 def build_curve_payloads(payload: dict) -> list[dict]:
     center_spot = float(payload["spot"])
     min_spot = center_spot * (1 - 0.3)
     max_spot = center_spot * (1 + 0.3)
     spots = [min_spot + (max_spot - min_spot) * i / 24 for i in range(25)]
 
-    rows = []
+    rows: list[dict] = []
     for spot in spots:
         resp, status = handle_price_request({**payload, "spot": spot})
         if status != 200:
@@ -210,6 +204,9 @@ def render_chart(df: pd.DataFrame, greek_key: str) -> None:
 
 
 def app() -> None:
+    st.set_page_config(page_title="Option Pricer", layout="wide")
+    st.markdown(CSS, unsafe_allow_html=True)
+
     with st.form("option_pricer_form"):
         left, right = st.columns([1.05, 1.35], gap="large")
 
@@ -251,14 +248,15 @@ def app() -> None:
         return
 
     curve_df = pd.DataFrame(build_curve_payloads(payload))
-    greek_key = "Delta"
-
-    st.markdown(
-        """
-        <div style='height: 1.2rem;'></div>
-        """,
-        unsafe_allow_html=True,
+    greek_choice = st.radio(
+        "Greek Type",
+        ["Delta", "Gamma", "Vega", "Theta", "Rho"],
+        index=0,
+        horizontal=True,
+        label_visibility="visible",
     )
+
+    st.markdown("<div style='height: 1.2rem;'></div>", unsafe_allow_html=True)
 
     left, right = st.columns([1.02, 1.35], gap="large")
     with left:
@@ -287,20 +285,11 @@ def app() -> None:
             """,
             unsafe_allow_html=True,
         )
-        render_chart(curve_df, greek_key.lower())
-
-        greek_choice = st.radio(
-            "Greek Type",
-            ["Delta", "Gamma", "Vega", "Theta", "Rho"],
-            index=0,
-            horizontal=True,
-            label_visibility="visible",
-        )
-        if greek_choice:
-            render_chart(curve_df, greek_choice.lower())
+        render_chart(curve_df, greek_choice.lower())
 
 
-app()
+if __name__ == "__main__":
+    app()
 
 
 # This script intentionally renders the custom UI in Streamlit instead of starting
