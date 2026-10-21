@@ -35,12 +35,16 @@ CSS = """
         margin-top: 0.5rem;
         max-width: 430px;
         width: 100%;
+        background: transparent;
+        border: none;
+        padding: 0;
     }
     .metric-row {
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr auto;
         align-items: center;
-        padding: 0.55rem 0;
+        gap: 1rem;
+        padding: 0.58rem 0;
         border-top: 1px solid rgba(148,163,184,0.22);
         color: #edf4fb;
     }
@@ -51,11 +55,14 @@ CSS = """
         color: #dfeaf7;
         font-size: 1.05rem;
         font-weight: 500;
+        text-align: left;
     }
     .metric-value {
         font-size: 1.06rem;
         font-weight: 700;
         color: #ffffff;
+        text-align: right;
+        min-width: 110px;
     }
     .section-title {
         font-size: 1.15rem;
